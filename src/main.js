@@ -1,52 +1,28 @@
 import { createApp } from 'vue'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createPinia } from 'pinia'
 import './style.css'
 import App from './App.vue'
+import router from './router'
+import axios from 'axios'
 
-// Create router
-const router = createRouter({
-  history: createWebHistory(),
-  routes: [
-    { 
-      path: '/', 
-      name: 'Home', 
-      component: async () => await import('./views/Home.vue') 
+const pinia = createPinia()
+
+axios.defaults.headers.common['Content-Type'] = 'application/json'
+axios.defaults.headers.common['Accept'] = 'application/json'
+const api = import.meta.env.VITE_API_URL
+
+axios.interceptors.request.use(
+    async (config) => {
+        config.url = `${api}${config.url}`
+        return await config
     },
-    { 
-      path: '/services', 
-      name: 'Services', 
-      component: async () => await import('./views/Services.vue') 
-    },
-    { 
-      path: '/about', 
-      name: 'About', 
-      component: async () => await import('./views/About.vue') 
-    },
-    { 
-      path: '/gallery', 
-      name: 'Gallery', 
-      component: async () => await import('./views/Gallery.vue') 
-    },
-    { 
-      path: '/contact', 
-      name: 'Contact', 
-      component: async () => await import('./views/Contact.vue') 
+    (error) => {
+        return Promise.reject(error)
     }
-  ],
-  scrollBehavior(to, from, savedPosition) {
-    if (to.hash) {
-      return {
-        el: to.hash,
-        behavior: 'smooth'
-      }
-    } else if (savedPosition) {
-      return savedPosition
-    } else {
-      return { top: 0, behavior: 'smooth' }
-    }
-  }
-})
+)
+
 
 createApp(App)
+  .use(pinia)
   .use(router)
   .mount('#app')

@@ -2,7 +2,7 @@
   <div class="before-after-container relative rounded-lg overflow-hidden shadow-lg">
     <h3 class="absolute top-0 left-0 z-20 bg-primary text-white px-4 py-2 rounded-br-lg">{{ title }}</h3>
     
-    <div class="relative w-full h-72 md:h-96">
+    <div class="relative w-full h-72 md:h-96 lg:h-96">
       <!-- After Image (Full) -->
       <img :src="after" :alt="`After ${title}`" class="w-full h-full object-cover" />
       

@@ -69,7 +69,8 @@ export default {
         { to: '/services', label: 'Services' },
         { to: '/gallery', label: 'Gallery' },
         { to: '/about', label: 'About' },
-        { to: '/contact', label: 'Contact' }
+        { to: '/contact', label: 'Contact' },
+        { to: '/blog', label: 'Blog' }
       ]
     }
   },

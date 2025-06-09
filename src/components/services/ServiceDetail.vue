@@ -44,7 +44,7 @@ export default {
     },
     features: {
       type: Array,
-      required: true
+      required: false
     },
     image: {
       type: String,

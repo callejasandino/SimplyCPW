@@ -1,7 +1,7 @@
 <template>
   <div class="about-page">
     <!-- Page Header -->
-    <section class="relative py-20 bg-primary">
+    <section class="relative py-52 bg-primary">
       <div class="absolute inset-0 bg-primary opacity-90">
         <div class="absolute inset-0 bg-[url('https://images.pexels.com/photos/6044972/pexels-photo-6044972.jpeg?auto=compress&cs=tinysrgb&w=1920')] bg-cover bg-center mix-blend-overlay"></div>
       </div>
@@ -21,14 +21,16 @@
         <div class="flex flex-col md:flex-row items-center gap-8">
           <div class="md:w-1/2">
             <h2 class="text-3xl md:text-4xl font-bold mb-6 text-primary">Our Story</h2>
-            <p class="text-gray-700 mb-4">
-              Simply Clean Power WashingPro was founded in 2015 with a simple mission: to provide exceptional pressure washing services that transform properties and exceed customer expectations.
+            <p class="text-gray-700 mb-10">
+              {{ companyStory }}
             </p>
-            <p class="text-gray-700 mb-4">
-              What started as a small operation with a single pressure washer has grown into a trusted service provider for both residential and commercial clients throughout the region. Our growth is a testament to our commitment to quality work and customer satisfaction.
+            <h2 class="text-3xl md:text-4xl font-bold mb-6 text-primary">Our Mission</h2>
+            <p class="text-gray-700 mb-10">
+              {{ companyMission }}
             </p>
+            <h2 class="text-3xl md:text-4xl font-bold mb-6 text-primary">Our Vision</h2>
             <p class="text-gray-700">
-              Today, our team of skilled technicians continues to uphold the values that built our reputation: attention to detail, use of professional-grade equipment, eco-friendly practices, and a dedication to making properties look their absolute best.
+              {{ companyVision }}
             </p>
           </div>
           <div class="md:w-1/2">
@@ -108,56 +110,21 @@
         </p>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div class="team-member bg-white rounded-lg overflow-hidden shadow-md transform transition duration-300 hover:-translate-y-2">
+          <div class="team-member bg-white rounded-lg overflow-hidden shadow-md transform transition duration-300 hover:-translate-y-2" v-for="member in members" :key="member.id">
             <div class="relative h-72">
               <img 
-                src="https://images.pexels.com/photos/3760790/pexels-photo-3760790.jpeg?auto=compress&cs=tinysrgb&w=800" 
-                alt="John Mitchell" 
+                :src="member.image" 
+                :alt="member.name" 
                 class="w-full h-full object-cover"
               />
-            </div>
+            </div>  
             <div class="p-6">
-              <h3 class="text-xl font-bold text-primary mb-1">John Mitchell</h3>
-              <p class="text-gray-600 mb-3">Founder & CEO</p>
-              <p class="text-gray-700">
-                With over 15 years of experience in the pressure washing industry, John founded Simply Clean Power WashingPro to provide exceptional service with environmental responsibility.
-              </p>
+              <h3 class="text-xl font-bold mb-3 text-primary">{{ member.name }}</h3>
+              <h4 class="text-gray-600">Email: {{ member.email }}</h4>
             </div>
           </div>
           
-          <div class="team-member bg-white rounded-lg overflow-hidden shadow-md transform transition duration-300 hover:-translate-y-2">
-            <div class="relative h-72">
-              <img 
-                src="https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&w=800" 
-                alt="Sarah Johnson" 
-                class="w-full h-full object-cover"
-              />
-            </div>
-            <div class="p-6">
-              <h3 class="text-xl font-bold text-primary mb-1">Sarah Johnson</h3>
-              <p class="text-gray-600 mb-3">Operations Manager</p>
-              <p class="text-gray-700">
-                Sarah ensures all projects run smoothly from scheduling to completion, maintaining our high standards of quality and customer satisfaction.
-              </p>
-            </div>
-          </div>
           
-          <div class="team-member bg-white rounded-lg overflow-hidden shadow-md transform transition duration-300 hover:-translate-y-2">
-            <div class="relative h-72">
-              <img 
-                src="https://images.pexels.com/photos/1978505/pexels-photo-1978505.jpeg?auto=compress&cs=tinysrgb&w=800" 
-                alt="Michael Rodriguez" 
-                class="w-full h-full object-cover"
-              />
-            </div>
-            <div class="p-6">
-              <h3 class="text-xl font-bold text-primary mb-1">Michael Rodriguez</h3>
-              <p class="text-gray-600 mb-3">Lead Technician</p>
-              <p class="text-gray-700">
-                Mike brings technical expertise and attention to detail to every job, specializing in challenging restoration projects and commercial applications.
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </section>
@@ -298,8 +265,8 @@
           <router-link to="/contact" class="btn btn-accent text-lg">
             Get a Free Quote
           </router-link>
-          <a href="tel:5551234567" class="btn bg-white text-primary hover:bg-gray-100 text-lg">
-            Call (555) 123-4567
+          <a :href="`tel:${companyPhone}`" class="btn bg-white text-primary hover:bg-gray-100 text-lg">
+            Call {{ companyPhone }}
           </a>
         </div>
       </div>
@@ -308,7 +275,30 @@
 </template>
 
 <script>
+import { useSettingsStore } from '../store/settings'
+import { useMembersStore } from '../store/members'
+
 export default {
-  name: 'About'
+  name: 'About',
+  data() {
+    return {
+      settingsStore: useSettingsStore(),
+      membersStore: useMembersStore(),
+      companyStory: '',
+      companyMission: '',
+      companyVision: '',
+      members: [],
+      companyPhone: ''
+    }
+  },
+  mounted() {
+    this.members = this.membersStore.members
+    this.companyStory = this.settingsStore.companyStory
+    this.companyMission = this.settingsStore.companyMission
+    this.companyVision = this.settingsStore.companyVision
+    this.companyPhone = this.settingsStore.companyPhone
+    console.log(this.members)
+  }
+
 }
 </script>

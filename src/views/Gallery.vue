@@ -1,7 +1,7 @@
 <template>
   <div class="gallery-page">
     <!-- Page Header -->
-    <section class="relative py-20 bg-primary">
+    <section class="relative py-52 bg-primary">
       <div class="absolute inset-0 bg-primary opacity-90">
         <div class="absolute inset-0 bg-[url('https://images.pexels.com/photos/19931558/pexels-photo-19931558.jpeg?auto=compress&cs=tinysrgb&w=1920')] bg-cover bg-center mix-blend-overlay"></div>
       </div>
@@ -20,11 +20,11 @@
       <div class="container mx-auto px-4">
         <div class="flex flex-wrap justify-center gap-4">
           <button 
-            v-for="category in categories" 
+            v-for="category in dynamicCategories" 
             :key="category"
             @click="activeCategory = category"
             :class="[
-              'px-4 py-2 rounded-full transition-all duration-300',
+              'category-btn px-4 py-2 rounded-full transition-all duration-300',
               activeCategory === category ? 'bg-primary text-white' : 'bg-white hover:bg-gray-200'
             ]"
           >
@@ -37,21 +37,33 @@
     <!-- Gallery Grid -->
     <section class="py-16 bg-white">
       <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Loading State -->
+        <div v-if="loading || galleryStore.loading" class="text-center py-12">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p class="mt-4 text-gray-600">Loading gallery...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else-if="!galleryItems.length" class="text-center py-12">
+          <p class="text-gray-600">No gallery items found.</p>
+        </div>
+
+        <!-- Gallery Items -->
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div 
             v-for="item in filteredGalleryItems" 
             :key="item.id"
-            class="gallery-item overflow-hidden rounded-lg shadow-md cursor-pointer transform transition duration-300 hover:shadow-xl hover:-translate-y-1"
+            class="gallery-item overflow-hidden rounded-lg shadow-md cursor-pointer transform transition duration-300 hover:shadow-xl hover:-translate-y-1 group"
             @click="openLightbox(item)"
           >
             <div class="relative">
-              <img :src="item.after" :alt="item.title" class="w-full h-64 object-cover" />
+              <img :src="item.image" :alt="`Gallery item ${item.id}`" class="w-full h-64 object-cover" />
               
               <!-- Overlay with info -->
-              <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+              <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
                 <div class="text-white text-center px-4 transform translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                  <h3 class="text-xl font-bold">{{ item.title }}</h3>
-                  <p>Click to view before & after</p>
+                  <h3 class="text-xl font-bold">{{ item.category }}</h3>
+                  <p>Click to view details</p>
                 </div>
               </div>
               
@@ -64,7 +76,7 @@
         </div>
         
         <!-- Show More Button -->
-        <div class="text-center mt-12" v-if="showLoadMore">
+        <div v-if="!loading && !galleryStore.loading && galleryItems.length && showLoadMore" class="text-center mt-12">
           <button @click="loadMore" class="btn btn-outline">
             Load More
           </button>
@@ -85,17 +97,26 @@
         <!-- Lightbox Content -->
         <div class="bg-white rounded-lg overflow-hidden">
           <div class="p-4 bg-primary text-white">
-            <h3 class="text-xl font-bold">{{ lightbox.item?.title }}</h3>
+            <h3 class="text-xl font-bold">{{ lightbox.item?.category }}</h3>
           </div>
           
-          <!-- Before/After Comparison -->
-          <div class="relative">
-            <BeforeAfterImage
-              v-if="lightbox.item"
-              :before="lightbox.item.before"
-              :after="lightbox.item.after"
-              :title="lightbox.item.title"
-            />
+          <!-- Gallery Image -->
+          <div class="relative overflow-hidden">
+            <transition 
+              name="slide" 
+              mode="out-in"
+              @before-enter="beforeEnter"
+              @enter="enter"
+              @leave="leave"
+            >
+              <img 
+                v-if="lightbox.item"
+                :key="lightbox.item.id"
+                :src="lightbox.item.image" 
+                :alt="`Gallery item ${lightbox.item.id}`"
+                class="w-full h-auto max-h-96 object-contain transition-transform duration-300 ease-in-out"
+              />
+            </transition>
           </div>
           
           <div class="p-4">
@@ -106,7 +127,7 @@
         <!-- Navigation Arrows -->
         <button 
           @click="prevItem" 
-          class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-12 text-white hover:text-gray-300"
+          class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-12 text-white hover:text-gray-300 p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70"
         >
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
@@ -115,7 +136,7 @@
         
         <button 
           @click="nextItem" 
-          class="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-12 text-white hover:text-gray-300"
+          class="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-12 text-white hover:text-gray-300 p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70"
         >
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -140,124 +161,34 @@
 </template>
 
 <script>
-import BeforeAfterImage from '../components/gallery/BeforeAfterImage.vue';
-
+import { useGalleryStore } from '../store/gallery';
 export default {
   name: 'Gallery',
-  components: {
-    BeforeAfterImage
-  },
   data() {
     return {
+      galleryStore: useGalleryStore(),
+      galleryItems: [],
       activeCategory: 'All',
       visibleItems: 9,
       lightbox: {
         visible: false,
         item: null,
-        index: 0
+        index: 0,
+        direction: 'next'
       },
-      categories: ['All', 'Residential', 'Commercial', 'Driveways', 'Decks & Patios', 'Roofs'],
-      galleryItems: [
-        {
-          id: 1,
-          title: 'House Exterior Cleaning',
-          category: 'Residential',
-          before: 'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg?auto=compress&cs=tinysrgb&w=800',
-          after: 'https://images.pexels.com/photos/53610/large-home-residential-house-architecture-53610.jpeg?auto=compress&cs=tinysrgb&w=800',
-          description: 'Complete transformation of this home\'s exterior with our soft washing technique that safely removes years of dirt, mold, and algae buildup.'
-        },
-        {
-          id: 2,
-          title: 'Concrete Driveway Restoration',
-          category: 'Driveways',
-          before: 'https://images.pexels.com/photos/5764077/pexels-photo-5764077.jpeg?auto=compress&cs=tinysrgb&w=800',
-          after: 'https://images.pexels.com/photos/3935335/pexels-photo-3935335.jpeg?auto=compress&cs=tinysrgb&w=800',
-          description: 'This driveway was covered in oil stains, dirt, and years of weathering. Our high-pressure cleaning and specialized detergents brought it back to life.'
-        },
-        {
-          id: 3,
-          title: 'Storefront Cleaning',
-          category: 'Commercial',
-          before: 'https://images.pexels.com/photos/380768/pexels-photo-380768.jpeg?auto=compress&cs=tinysrgb&w=800',
-          after: 'https://images.pexels.com/photos/2079851/pexels-photo-2079851.jpeg?auto=compress&cs=tinysrgb&w=800',
-          description: 'Improved curb appeal for this local business with our commercial pressure washing service that removed grime and pollution buildup.'
-        },
-        {
-          id: 4,
-          title: 'Wooden Deck Revival',
-          category: 'Decks & Patios',
-          before: 'https://images.pexels.com/photos/260046/pexels-photo-260046.jpeg?auto=compress&cs=tinysrgb&w=800',
-          after: 'https://images.pexels.com/photos/5997996/pexels-photo-5997996.jpeg?auto=compress&cs=tinysrgb&w=800',
-          description: 'This aging wooden deck was brought back to its original beauty with our gentle pressure washing and wood restoration process.'
-        },
-        {
-          id: 5,
-          title: 'Roof Cleaning & Treatment',
-          category: 'Roofs',
-          before: 'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg?auto=compress&cs=tinysrgb&w=800',
-          after: 'https://images.pexels.com/photos/2351719/pexels-photo-2351719.jpeg?auto=compress&cs=tinysrgb&w=800',
-          description: 'Black streaks and moss growth were eliminated with our specialized roof cleaning service, extending the life of the roof and improving home value.'
-        },
-        {
-          id: 6,
-          title: 'Sidewalk Cleaning',
-          category: 'Driveways',
-          before: 'https://images.pexels.com/photos/12167758/pexels-photo-12167758.jpeg?auto=compress&cs=tinysrgb&w=800',
-          after: 'https://images.pexels.com/photos/5847338/pexels-photo-5847338.jpeg?auto=compress&cs=tinysrgb&w=800',
-          description: 'Public walkway transformed with our high-pressure cleaning that removed years of dirt, gum, and stains.'
-        },
-        {
-          id: 7,
-          title: 'Patio Stone Restoration',
-          category: 'Decks & Patios',
-          before: 'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
-          after: 'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800',
-          description: 'These natural stone pavers were revitalized with our specialized cleaning process, removing years of dirt, moss, and weathering.'
-        },
-        {
-          id: 8,
-          title: 'Commercial Building Washing',
-          category: 'Commercial',
-          before: 'https://images.pexels.com/photos/1531676/pexels-photo-1531676.jpeg?auto=compress&cs=tinysrgb&w=800',
-          after: 'https://images.pexels.com/photos/2727483/pexels-photo-2727483.jpeg?auto=compress&cs=tinysrgb&w=800',
-          description: 'Complete exterior cleaning of this commercial property that removed pollution, grime, and improved the building\'s appearance.'
-        },
-        {
-          id: 9,
-          title: 'Vinyl Siding Cleaning',
-          category: 'Residential',
-          before: 'https://images.pexels.com/photos/2696468/pexels-photo-2696468.jpeg?auto=compress&cs=tinysrgb&w=800',
-          after: 'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800',
-          description: 'This home\'s vinyl siding was covered in green algae and dirt. Our soft washing technique safely removed the buildup without damaging the siding.'
-        },
-        {
-          id: 10,
-          title: 'Restaurant Patio Cleaning',
-          category: 'Commercial',
-          before: 'https://images.pexels.com/photos/1267356/pexels-photo-1267356.jpeg?auto=compress&cs=tinysrgb&w=800',
-          after: 'https://images.pexels.com/photos/67468/pexels-photo-67468.jpeg?auto=compress&cs=tinysrgb&w=800',
-          description: 'This restaurant\'s outdoor dining area was revitalized with our professional pressure washing service, creating a more inviting space for customers.'
-        },
-        {
-          id: 11,
-          title: 'Concrete Pool Deck',
-          category: 'Decks & Patios',
-          before: 'https://images.pexels.com/photos/261262/pexels-photo-261262.jpeg?auto=compress&cs=tinysrgb&w=800',
-          after: 'https://images.pexels.com/photos/261327/pexels-photo-261327.jpeg?auto=compress&cs=tinysrgb&w=800',
-          description: 'This pool deck was restored to its original beauty, removing algae, mildew, and stains that had built up over time.'
-        },
-        {
-          id: 12,
-          title: 'Brick Home Washing',
-          category: 'Residential',
-          before: 'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg?auto=compress&cs=tinysrgb&w=800',
-          after: 'https://images.pexels.com/photos/259600/pexels-photo-259600.jpeg?auto=compress&cs=tinysrgb&w=800',
-          description: 'Our specialized brick cleaning process removed years of dirt and pollution from this historic home while preserving the integrity of the mortar.'
-        }
-      ]
+      categories: ['All'],
+      loading: false,
+      currentPage: 1,
+      totalPages: 1
     }
   },
   computed: {
+    dynamicCategories() {
+      if (!this.galleryItems.length) return ['All'];
+      
+      const uniqueCategories = [...new Set(this.galleryItems.map(item => item.category))];
+      return ['All', ...uniqueCategories.sort()];
+    },
     filteredGalleryItems() {
       let filtered = this.activeCategory === 'All' 
         ? this.galleryItems 
@@ -274,6 +205,22 @@ export default {
     }
   },
   methods: {
+    async loadGalleryData() {
+      try {
+        this.loading = true;
+        await this.galleryStore.fetchGallery();
+        this.galleryItems = this.galleryStore.gallery;
+        
+        if (this.galleryStore.galleryResponse) {
+          this.currentPage = this.galleryStore.galleryResponse.current_page;
+          this.totalPages = this.galleryStore.galleryResponse.last_page;
+        }
+      } catch (error) {
+        console.error('Error loading gallery data:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
     loadMore() {
       this.visibleItems += 6;
     },
@@ -287,19 +234,45 @@ export default {
       this.lightbox.item = item;
       this.lightbox.index = index;
       this.lightbox.visible = true;
+      this.lightbox.direction = 'next';
       
       // Prevent body scrolling
       document.body.style.overflow = 'hidden';
+      
+      // Add keyboard navigation
+      document.addEventListener('keydown', this.handleKeydown);
     },
     closeLightbox() {
       this.lightbox.visible = false;
       document.body.style.overflow = '';
+      
+      // Remove keyboard navigation
+      document.removeEventListener('keydown', this.handleKeydown);
+    },
+    handleKeydown(e) {
+      if (!this.lightbox.visible) return;
+      
+      switch(e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          this.prevItem();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          this.nextItem();
+          break;
+        case 'Escape':
+          e.preventDefault();
+          this.closeLightbox();
+          break;
+      }
     },
     prevItem() {
       let filtered = this.activeCategory === 'All' 
         ? this.galleryItems 
         : this.galleryItems.filter(item => item.category === this.activeCategory);
       
+      this.lightbox.direction = 'prev';
       const newIndex = (this.lightbox.index - 1 + filtered.length) % filtered.length;
       this.lightbox.index = newIndex;
       this.lightbox.item = filtered[newIndex];
@@ -309,18 +282,75 @@ export default {
         ? this.galleryItems 
         : this.galleryItems.filter(item => item.category === this.activeCategory);
       
+      this.lightbox.direction = 'next';
       const newIndex = (this.lightbox.index + 1) % filtered.length;
       this.lightbox.index = newIndex;
       this.lightbox.item = filtered[newIndex];
+    },
+    // Animation methods
+    beforeEnter(el) {
+      if (this.lightbox.direction === 'next') {
+        el.style.transform = 'translateX(100%)';
+      } else {
+        el.style.transform = 'translateX(-100%)';
+      }
+      el.style.opacity = '0';
+    },
+    enter(el, done) {
+      el.offsetHeight; // Force reflow
+      el.style.transition = 'transform 0.3s ease-in-out, opacity 0.3s ease-in-out';
+      el.style.transform = 'translateX(0)';
+      el.style.opacity = '1';
+      setTimeout(done, 300);
+    },
+    leave(el, done) {
+      el.style.transition = 'transform 0.3s ease-in-out, opacity 0.3s ease-in-out';
+      if (this.lightbox.direction === 'next') {
+        el.style.transform = 'translateX(-100%)';
+      } else {
+        el.style.transform = 'translateX(100%)';
+      }
+      el.style.opacity = '0';
+      setTimeout(done, 300);
     }
   },
   beforeUnmount() {
     // Ensure body scrolling is restored if component unmounts while lightbox is open
     document.body.style.overflow = '';
+    // Remove keyboard event listener
+    document.removeEventListener('keydown', this.handleKeydown);
+  },
+
+  async mounted() {
+    await this.loadGalleryData();
   }
 }
 </script>
 
 <style scoped>
-/* Add custom scoped styles if needed */
+/* Lightbox slide transitions */
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.3s ease-in-out;
+}
+
+.slide-enter-from {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.slide-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+/* Category button animations */
+.category-btn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.category-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
 </style>

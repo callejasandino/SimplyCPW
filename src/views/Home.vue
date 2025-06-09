@@ -86,47 +86,14 @@
         </p>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <ServiceCard 
-            title="Residential Washing" 
-            description="Complete exterior cleaning for homes, including siding, patios, and driveways."
-            image="https://images.pexels.com/photos/2244746/pexels-photo-2244746.jpeg?auto=compress&cs=tinysrgb&w=600"
-            link="/services#residential"
-          />
-          
-          <ServiceCard 
-            title="Commercial Cleaning" 
-            description="Keep your business looking professional with our commercial pressure washing services."
-            image="https://images.pexels.com/photos/6195124/pexels-photo-6195124.jpeg?auto=compress&cs=tinysrgb&w=600"
-            link="/services#commercial"
-          />
-          
-          <ServiceCard 
-            title="Driveway & Sidewalk" 
-            description="Remove stubborn stains and restore your concrete surfaces to like-new condition."
-            image="https://images.pexels.com/photos/6195011/pexels-photo-6195011.jpeg?auto=compress&cs=tinysrgb&w=600"
-            link="/services#driveways"
-          />
-          
-          <ServiceCard 
-            title="Deck & Patio Cleaning" 
-            description="Revive your outdoor living spaces by removing dirt, mold, and mildew."
-            image="https://images.pexels.com/photos/5725531/pexels-photo-5725531.jpeg?auto=compress&cs=tinysrgb&w=600"
-            link="/services#decks"
-          />
-          
-          <ServiceCard 
-            title="Roof Cleaning" 
-            description="Extend the life of your roof by removing algae, moss, and debris."
-            image="https://images.pexels.com/photos/7005449/pexels-photo-7005449.jpeg?auto=compress&cs=tinysrgb&w=600"
-            link="/services#roofs"
-          />
-          
-          <ServiceCard 
-            title="Fence Restoration" 
-            description="Restore your wooden, vinyl, or metal fences to their original beauty."
-            image="https://images.pexels.com/photos/13277632/pexels-photo-13277632.jpeg?auto=compress&cs=tinysrgb&w=600"
-            link="/services#fences"
-          />
+          <div v-for="service in services" :key="service.id">
+            <ServiceCard 
+              :title="service.name" 
+              :description="service.description"
+              :image="service.image"
+              :link="`/services/#${convertNameToId(service.name)}`"
+            />
+          </div>
         </div>
         
         <div class="text-center mt-12">
@@ -145,17 +112,13 @@
           See the dramatic difference our pressure washing services can make
         </p>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-8">
           <BeforeAfterImage 
-            before="https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg?auto=compress&cs=tinysrgb&w=600"
-            after="https://images.pexels.com/photos/53610/large-home-residential-house-architecture-53610.jpeg?auto=compress&cs=tinysrgb&w=600"
-            title="House Washing"
-          />
-          
-          <BeforeAfterImage 
-            before="https://images.pexels.com/photos/5764077/pexels-photo-5764077.jpeg?auto=compress&cs=tinysrgb&w=600"
-            after="https://images.pexels.com/photos/3935335/pexels-photo-3935335.jpeg?auto=compress&cs=tinysrgb&w=600"
-            title="Driveway Cleaning"
+            v-for="workResult in workResults" 
+            :key="workResult.id"
+            :before="workResult.before_image"
+            :after="workResult.after_image"
+            :title="workResult.title"
           />
         </div>
         
@@ -167,7 +130,7 @@
       </div>
     </section>
 
-    <!-- Testimonials -->
+    <!-- Testimonials
     <section class="py-16 bg-gray-100">
       <div class="container mx-auto px-4">
         <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Customer Reviews</h2>
@@ -177,7 +140,7 @@
         
         <TestimonialSlider :testimonials="testimonials" />
       </div>
-    </section>
+    </section> -->
 
     <!-- CTA Section -->
     <section class="py-20 bg-primary water-gradient text-white">
@@ -197,52 +160,35 @@
 <script>
 import ServiceCard from '../components/services/ServiceCard.vue';
 import BeforeAfterImage from '../components/gallery/BeforeAfterImage.vue';
-import TestimonialSlider from '../components/testimonials/TestimonialSlider.vue';
+import { useWorkResultStore } from '../store/work-result';
+import { useServiceStore } from '../store/service';
 
 export default {
   name: 'Home',
   components: {
     ServiceCard,
     BeforeAfterImage,
-    TestimonialSlider
+    // TestimonialSlider
   },
   data() {
     return {
-      testimonials: [
-        {
-          id: 1,
-          name: 'Sarah Johnson',
-          location: 'Riverdale',
-          quote: 'I was amazed at how quickly and efficiently they cleaned our driveway and patio. It looks brand new again! Highly recommend their services.',
-          rating: 5,
-          image: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=150'
-        },
-        {
-          id: 2,
-          name: 'Michael Rodriguez',
-          location: 'Lakeview',
-          quote: 'Simply Clean Power Washing completely transformed our storefront. The team was professional, prompt, and the results exceeded our expectations.',
-          rating: 5,
-          image: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150'
-        },
-        {
-          id: 3,
-          name: 'Jennifer Williams',
-          location: 'Oakdale',
-          quote: "Our deck was covered in mold and mildew. After Simply Clean Power Washing's treatment, it looks better than when we first installed it! Great value for the money.",
-          rating: 5,
-          image: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150'
-        },
-        {
-          id: 4,
-          name: 'David Thompson',
-          location: 'Pine Hills',
-          quote: "I've used several pressure washing services over the years, but Simply Clean Power Washing is by far the best. Thorough, careful, and reasonably priced.",
-          rating: 4,
-          image: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=150'
-        }
-      ]
+      workResultStore: useWorkResultStore(),
+      serviceStore: useServiceStore(),
     }
-  }
+  },
+  methods: {
+    convertNameToId(name) {
+      return name.toLowerCase().replace(/ /g, '-');
+    }
+  },
+  computed: {
+    workResults() {
+      return this.workResultStore.workResult || [];
+    },
+    services() {
+      return this.serviceStore.services || [];
+    }
+  },
+  
 }
 </script>
