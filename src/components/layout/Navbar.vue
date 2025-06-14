@@ -9,7 +9,7 @@
         <router-link to="/" class="flex items-center">
           <div class="flex items-center">
             <span class="text-2xl font-display font-bold" :class="scrolled ? 'text-primary' : 'text-white'">
-              Simply Clean<span class="text-secondary">Power Washing</span>
+              {{ companyName }}
             </span>
           </div>
         </router-link>
@@ -54,7 +54,7 @@
 
 <script>
 import NavLink from './NavLink.vue';
-
+import { useSettingsStore } from '../../store/settings';
 export default {
   name: 'Navbar',
   components: {
@@ -64,6 +64,7 @@ export default {
     return {
       scrolled: false,
       mobileMenuOpen: false,
+      companyName: '',
       navLinks: [
         { to: '/', label: 'Home' },
         { to: '/services', label: 'Services' },
@@ -71,11 +72,13 @@ export default {
         { to: '/about', label: 'About' },
         { to: '/contact', label: 'Contact' },
         { to: '/blog', label: 'Blog' }
-      ]
+      ],
+      settingsStore: useSettingsStore(),
     }
   },
   mounted() {
     window.addEventListener('scroll', this.handleScroll);
+    this.companyName = this.settingsStore.companyName;
   },
   beforeUnmount() {
     window.removeEventListener('scroll', this.handleScroll);

@@ -6,10 +6,10 @@
         <div class="absolute inset-0 bg-[url('https://images.pexels.com/photos/19931558/pexels-photo-19931558.jpeg?auto=compress&cs=tinysrgb&w=1920')] bg-cover bg-center mix-blend-overlay"></div>
       </div>
       <div class="container mx-auto px-4 relative z-10">
-        <div class="text-center text-white">
-          <h1 class="text-4xl md:text-5xl font-bold mb-4">Our Work</h1>
+        <div class="text-center text-white fade-in">
+          <h1 class="text-4xl md:text-5xl font-bold mb-4">Our Work Gallery</h1>
           <p class="text-xl max-w-3xl mx-auto">
-            Before and after transformations of our pressure washing services
+            Discover our amazing pressure washing transformations
           </p>
         </div>
       </div>
@@ -22,10 +22,12 @@
           <button 
             v-for="category in dynamicCategories" 
             :key="category"
-            @click="activeCategory = category"
+            @click="filterByCategory(category)"
             :class="[
-              'category-btn px-4 py-2 rounded-full transition-all duration-300',
-              activeCategory === category ? 'bg-primary text-white' : 'bg-white hover:bg-gray-200'
+              'btn px-6 py-2 rounded-full text-sm font-medium transition-all duration-300',
+              activeCategory === category 
+                ? 'btn-primary' 
+                : 'bg-white text-neutral-dark hover:bg-gray-50 border border-gray-300'
             ]"
           >
             {{ category }}
@@ -34,122 +36,103 @@
       </div>
     </section>
 
-    <!-- Gallery Grid -->
+    <!-- Gallery Masonry Grid -->
     <section class="py-16 bg-white">
       <div class="container mx-auto px-4">
         <!-- Loading State -->
-        <div v-if="loading || galleryStore.loading" class="text-center py-12">
+        <div v-if="galleryStore.loading && !galleryItems.length" class="text-center py-12">
           <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           <p class="mt-4 text-gray-600">Loading gallery...</p>
         </div>
 
         <!-- Empty State -->
-        <div v-else-if="!galleryItems.length" class="text-center py-12">
-          <p class="text-gray-600">No gallery items found.</p>
+        <div v-else-if="!groupedItemsByDate.length && !galleryStore.loading" class="text-center py-12">
+          <p class="text-gray-600">No gallery items found for this category.</p>
         </div>
 
-        <!-- Gallery Items -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Gallery by Date Groups -->
+        <div v-else class="space-y-12">
           <div 
-            v-for="item in filteredGalleryItems" 
-            :key="item.id"
-            class="gallery-item overflow-hidden rounded-lg shadow-md cursor-pointer transform transition duration-300 hover:shadow-xl hover:-translate-y-1 group"
-            @click="openLightbox(item)"
+            v-for="(dateGroup, groupIndex) in groupedItemsByDate" 
+            :key="dateGroup.date"
+            class="date-group"
           >
-            <div class="relative">
-              <img :src="item.image" :alt="`Gallery item ${item.id}`" class="w-full h-64 object-cover" />
-              
-              <!-- Overlay with info -->
-              <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
-                <div class="text-white text-center px-4 transform translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                  <h3 class="text-xl font-bold">{{ item.category }}</h3>
-                  <p>Click to view details</p>
+            <!-- Date Header -->
+            <div class="mb-6">
+              <h2 class="text-2xl font-bold text-neutral-dark border-b-2 border-primary pb-2 inline-block">
+                {{ dateGroup.date }}
+              </h2>
+              <p class="text-sm text-neutral mt-1">{{ dateGroup.items.length }} image{{ dateGroup.items.length !== 1 ? 's' : '' }}</p>
+            </div>
+            
+            <!-- Masonry Grid for this date -->
+            <div class="masonry-grid">
+              <div 
+                v-for="(item, index) in dateGroup.items" 
+                :key="`${item.id}-${activeCategory}-${dateGroup.date}`"
+                :class="[
+                  'masonry-item',
+                  'slide-up'
+                ]"
+                :style="{ 'animation-delay': `${((groupIndex * 10) + (index % 10)) * 100}ms` }"
+                @click="openLightbox(item, getGlobalIndex(dateGroup, index))"
+              >
+                <div class="gallery-card card cursor-pointer group overflow-hidden">
+                  <!-- Image Container -->
+                  <div class="relative overflow-hidden">
+                    <img 
+                      :src="item.image" 
+                      :alt="`${item.category} - Gallery item ${item.id}`"
+                      class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-110"
+                      loading="lazy"
+                      @load="onImageLoad"
+                    />
+                    
+                    <!-- Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div class="absolute bottom-0 left-0 right-0 p-4">
+                        <h3 class="text-white font-semibold text-lg mb-1">{{ item.category }}</h3>
+                        <p class="text-white/90 text-sm">{{ item.description || 'Click to view details' }}</p>
+                      </div>
+                    </div>
+
+                    <!-- Category Badge -->
+                    <div class="absolute top-3 right-3 bg-primary text-white text-xs px-2 py-1 rounded-full font-medium">
+                      {{ item.category }}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              
-              <!-- Category Badge -->
-              <div class="absolute top-0 right-0 bg-primary text-white text-sm px-3 py-1 m-2 rounded-full">
-                {{ item.category }}
               </div>
             </div>
           </div>
         </div>
-        
-        <!-- Show More Button -->
-        <div v-if="!loading && !galleryStore.loading && galleryItems.length && showLoadMore" class="text-center mt-12">
-          <button @click="loadMore" class="btn btn-outline">
-            Load More
-          </button>
+
+        <!-- Infinite Scroll Loading -->
+        <div v-if="galleryStore.loading && galleryItems.length" class="text-center py-8">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <p class="mt-2 text-gray-600 text-sm">Loading more images...</p>
+        </div>
+
+        <!-- End of Results -->
+        <div v-if="!galleryStore.hasMorePages() && galleryItems.length && !galleryStore.loading" class="text-center py-8">
+          <p class="text-gray-500 text-sm">You've reached the end of our gallery!</p>
         </div>
       </div>
     </section>
 
-    <!-- Lightbox -->
-    <div v-if="lightbox.visible" class="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
-      <div class="relative max-w-4xl w-full">
-        <!-- Close Button -->
-        <button @click="closeLightbox" class="absolute -top-10 right-0 text-white hover:text-gray-300">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-        
-        <!-- Lightbox Content -->
-        <div class="bg-white rounded-lg overflow-hidden">
-          <div class="p-4 bg-primary text-white">
-            <h3 class="text-xl font-bold">{{ lightbox.item?.category }}</h3>
-          </div>
-          
-          <!-- Gallery Image -->
-          <div class="relative overflow-hidden">
-            <transition 
-              name="slide" 
-              mode="out-in"
-              @before-enter="beforeEnter"
-              @enter="enter"
-              @leave="leave"
-            >
-              <img 
-                v-if="lightbox.item"
-                :key="lightbox.item.id"
-                :src="lightbox.item.image" 
-                :alt="`Gallery item ${lightbox.item.id}`"
-                class="w-full h-auto max-h-96 object-contain transition-transform duration-300 ease-in-out"
-              />
-            </transition>
-          </div>
-          
-          <div class="p-4">
-            <p class="text-gray-700">{{ lightbox.item?.description }}</p>
-          </div>
-        </div>
-        
-        <!-- Navigation Arrows -->
-        <button 
-          @click="prevItem" 
-          class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-12 text-white hover:text-gray-300 p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70"
-        >
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-          </svg>
-        </button>
-        
-        <button 
-          @click="nextItem" 
-          class="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-12 text-white hover:text-gray-300 p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70"
-        >
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
+    <!-- Vue Easy Lightbox -->
+    <vue-easy-lightbox
+      :visible="visibleLightbox"
+      :imgs="lightboxImages"
+      :index="currentImageIndex"
+      @hide="closeLightbox"
+    ></vue-easy-lightbox>
 
     <!-- CTA Section -->
-    <section class="py-16 bg-primary water-gradient text-white">
-      <div class="container mx-auto px-4 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready for Your Transformation?</h2>
-        <p class="text-xl mb-8 max-w-3xl mx-auto">
+    <section class="section water-gradient text-white">
+      <div class="container mx-auto text-center">
+        <h2 class="section-title text-white mb-6">Ready for Your Transformation?</h2>
+        <p class="text-xl mb-8 max-w-3xl mx-auto opacity-90">
           Contact us today to schedule your pressure washing service and see the difference for yourself.
         </p>
         <router-link to="/contact" class="btn btn-accent text-lg px-8 py-4">
@@ -162,195 +145,240 @@
 
 <script>
 import { useGalleryStore } from '../store/gallery';
+import VueEasyLightbox from 'vue-easy-lightbox';
+
 export default {
   name: 'Gallery',
+  components: {
+    VueEasyLightbox
+  },
   data() {
     return {
       galleryStore: useGalleryStore(),
-      galleryItems: [],
       activeCategory: 'All',
-      visibleItems: 9,
-      lightbox: {
-        visible: false,
-        item: null,
-        index: 0,
-        direction: 'next'
-      },
-      categories: ['All'],
-      loading: false,
-      currentPage: 1,
-      totalPages: 1
+      isInfiniteScrollEnabled: true,
+      loadedImages: 0,
+      // Lightbox
+      visibleLightbox: false,
+      currentImageIndex: 0
     }
   },
   computed: {
+    galleryItems() {
+      // Sort by created_at date in ascending order (oldest first)
+      return [...this.galleryStore.gallery].sort((a, b) => {
+        return new Date(a.created_at) - new Date(b.created_at);
+      });
+    },
     dynamicCategories() {
       if (!this.galleryItems.length) return ['All'];
       
       const uniqueCategories = [...new Set(this.galleryItems.map(item => item.category))];
       return ['All', ...uniqueCategories.sort()];
     },
-    filteredGalleryItems() {
-      let filtered = this.activeCategory === 'All' 
+    filteredItems() {
+      const filtered = this.activeCategory === 'All' 
         ? this.galleryItems 
         : this.galleryItems.filter(item => item.category === this.activeCategory);
       
-      return filtered.slice(0, this.visibleItems);
+      // Ensure filtered items are also sorted by created_at (oldest first)
+      return filtered.sort((a, b) => {
+        return new Date(a.created_at) - new Date(b.created_at);
+      });
     },
-    showLoadMore() {
-      let filtered = this.activeCategory === 'All' 
-        ? this.galleryItems 
-        : this.galleryItems.filter(item => item.category === this.activeCategory);
+    groupedItemsByDate() {
+      const groups = {};
       
-      return this.visibleItems < filtered.length;
+      this.filteredItems.forEach(item => {
+        const date = new Date(item.created_at);
+        const dateKey = date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        
+        if (!groups[dateKey]) {
+          groups[dateKey] = [];
+        }
+        groups[dateKey].push(item);
+      });
+      
+      // Convert to array and sort by date (oldest first)
+      return Object.entries(groups)
+        .sort(([dateA], [dateB]) => {
+          return new Date(dateA) - new Date(dateB);
+        })
+        .map(([date, items]) => ({
+          date,
+          items: items.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+        }));
+    },
+    lightboxImages() {
+      return this.filteredItems.map(item => ({
+        src: item.image,
+        title: `${item.category} - ${item.description || 'Professional pressure washing service'}`
+      }));
     }
   },
   methods: {
-    async loadGalleryData() {
-      try {
-        this.loading = true;
-        await this.galleryStore.fetchGallery();
-        this.galleryItems = this.galleryStore.gallery;
-        
-        if (this.galleryStore.galleryResponse) {
-          this.currentPage = this.galleryStore.galleryResponse.current_page;
-          this.totalPages = this.galleryStore.galleryResponse.last_page;
+    async filterByCategory(category) {
+      this.activeCategory = category;
+      
+      // Reset gallery if switching categories and reload from first page
+      if (category !== 'All') {
+        this.galleryStore.resetGallery();
+        await this.galleryStore.fetchGallery(1);
+      }
+    },
+    
+    async loadMoreIfNeeded() {
+      if (!this.isInfiniteScrollEnabled || this.galleryStore.loading) return;
+      
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const threshold = document.documentElement.offsetHeight - 1000; // Load when 1000px from bottom
+      
+      if (scrollPosition >= threshold && this.galleryStore.hasMorePages()) {
+        try {
+          await this.galleryStore.loadMoreGallery();
+        } catch (error) {
+          console.error('Error loading more gallery items:', error);
         }
-      } catch (error) {
-        console.error('Error loading gallery data:', error);
-      } finally {
-        this.loading = false;
       }
     },
-    loadMore() {
-      this.visibleItems += 6;
+    
+    openLightbox(item, index) {
+      this.currentImageIndex = index;
+      this.visibleLightbox = true;
     },
-    openLightbox(item) {
-      let filtered = this.activeCategory === 'All' 
-        ? this.galleryItems 
-        : this.galleryItems.filter(i => i.category === this.activeCategory);
-      
-      const index = filtered.findIndex(i => i.id === item.id);
-      
-      this.lightbox.item = item;
-      this.lightbox.index = index;
-      this.lightbox.visible = true;
-      this.lightbox.direction = 'next';
-      
-      // Prevent body scrolling
-      document.body.style.overflow = 'hidden';
-      
-      // Add keyboard navigation
-      document.addEventListener('keydown', this.handleKeydown);
-    },
+    
     closeLightbox() {
-      this.lightbox.visible = false;
-      document.body.style.overflow = '';
-      
-      // Remove keyboard navigation
-      document.removeEventListener('keydown', this.handleKeydown);
+      this.visibleLightbox = false;
     },
-    handleKeydown(e) {
-      if (!this.lightbox.visible) return;
+    
+    onImageLoad() {
+      this.loadedImages++;
+      // Trigger masonry layout recalculation if needed
+      this.$nextTick(() => {
+        this.recalculateMasonry();
+      });
+    },
+    
+    recalculateMasonry() {
+      // Simple masonry recalculation - now works with date groups
+      const items = document.querySelectorAll('.masonry-item');
+      if (!items) return;
       
-      switch(e.key) {
-        case 'ArrowLeft':
-          e.preventDefault();
-          this.prevItem();
-          break;
-        case 'ArrowRight':
-          e.preventDefault();
-          this.nextItem();
-          break;
-        case 'Escape':
-          e.preventDefault();
-          this.closeLightbox();
-          break;
+      items.forEach((item, index) => {
+        item.style.animationDelay = `${(index % 10) * 100}ms`;
+      });
+    },
+    
+    getGlobalIndex(dateGroup, localIndex) {
+      // Calculate the global index for lightbox navigation
+      let globalIndex = 0;
+      
+      for (const group of this.groupedItemsByDate) {
+        if (group.date === dateGroup.date) {
+          return globalIndex + localIndex;
+        }
+        globalIndex += group.items.length;
       }
-    },
-    prevItem() {
-      let filtered = this.activeCategory === 'All' 
-        ? this.galleryItems 
-        : this.galleryItems.filter(item => item.category === this.activeCategory);
       
-      this.lightbox.direction = 'prev';
-      const newIndex = (this.lightbox.index - 1 + filtered.length) % filtered.length;
-      this.lightbox.index = newIndex;
-      this.lightbox.item = filtered[newIndex];
-    },
-    nextItem() {
-      let filtered = this.activeCategory === 'All' 
-        ? this.galleryItems 
-        : this.galleryItems.filter(item => item.category === this.activeCategory);
-      
-      this.lightbox.direction = 'next';
-      const newIndex = (this.lightbox.index + 1) % filtered.length;
-      this.lightbox.index = newIndex;
-      this.lightbox.item = filtered[newIndex];
-    },
-    // Animation methods
-    beforeEnter(el) {
-      if (this.lightbox.direction === 'next') {
-        el.style.transform = 'translateX(100%)';
-      } else {
-        el.style.transform = 'translateX(-100%)';
-      }
-      el.style.opacity = '0';
-    },
-    enter(el, done) {
-      el.offsetHeight; // Force reflow
-      el.style.transition = 'transform 0.3s ease-in-out, opacity 0.3s ease-in-out';
-      el.style.transform = 'translateX(0)';
-      el.style.opacity = '1';
-      setTimeout(done, 300);
-    },
-    leave(el, done) {
-      el.style.transition = 'transform 0.3s ease-in-out, opacity 0.3s ease-in-out';
-      if (this.lightbox.direction === 'next') {
-        el.style.transform = 'translateX(-100%)';
-      } else {
-        el.style.transform = 'translateX(100%)';
-      }
-      el.style.opacity = '0';
-      setTimeout(done, 300);
+      return localIndex;
     }
   },
-  beforeUnmount() {
-    // Ensure body scrolling is restored if component unmounts while lightbox is open
-    document.body.style.overflow = '';
-    // Remove keyboard event listener
-    document.removeEventListener('keydown', this.handleKeydown);
+  
+  mounted() {
+    // Setup infinite scroll
+    window.addEventListener('scroll', this.loadMoreIfNeeded);
+    window.addEventListener('resize', this.recalculateMasonry);
   },
-
-  async mounted() {
-    await this.loadGalleryData();
+  
+  beforeUnmount() {
+    // Cleanup
+    window.removeEventListener('scroll', this.loadMoreIfNeeded);
+    window.removeEventListener('resize', this.recalculateMasonry);
   }
 }
 </script>
 
 <style scoped>
-/* Lightbox slide transitions */
-.slide-enter-active,
-.slide-leave-active {
-  transition: all 0.3s ease-in-out;
+/* Masonry Grid Layout */
+.masonry-grid {
+  columns: 1;
+  column-gap: 1.5rem;
+  
+  @media (min-width: 640px) {
+    columns: 2;
+  }
+  
+  @media (min-width: 768px) {
+    columns: 3;
+  }
+  
+  @media (min-width: 1024px) {
+    columns: 4;
+  }
 }
 
-.slide-enter-from {
-  transform: translateX(100%);
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Gallery Card Styles */
+.gallery-card {
+  @apply transition-all duration-300 hover:shadow-xl;
+  transform: translateY(0);
+}
+
+.gallery-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Enhanced Image Hover Effects */
+.gallery-card img {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 640px) {
+  .masonry-grid {
+    columns: 1;
+    column-gap: 1rem;
+  }
+  
+  .masonry-item {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Loading animation improvements */
+@keyframes slideUp {
+  0% { 
+    transform: translateY(30px); 
+    opacity: 0; 
+  }
+  100% { 
+    transform: translateY(0); 
+    opacity: 1; 
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.6s ease-out forwards;
+}
+
+/* Lightbox enhancements */
+.lightbox-enter-active,
+.lightbox-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.lightbox-enter-from,
+.lightbox-leave-to {
   opacity: 0;
-}
-
-.slide-leave-to {
-  transform: translateX(-100%);
-  opacity: 0;
-}
-
-/* Category button animations */
-.category-btn {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.category-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 </style>

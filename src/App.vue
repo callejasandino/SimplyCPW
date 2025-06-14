@@ -8,20 +8,25 @@
         <p class="text-gray-500 mt-2">Please wait while we prepare everything for you</p>
       </div>
     </div>
+
+    <!-- Loading State -->
+
     <div v-else>
-       <Navbar />
-    
-      <!-- Loading State -->
-      
+      <div v-if="isJobDetailRoute">
+            <JobDetail />
+      </div>
+
+      <div v-else>
+      <Navbar />  
+        <!-- Main Content -->
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
         
-      <!-- Main Content -->
-      <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
-      
-      <Footer v-if="!isLoading" />
+        <Footer v-if="!isLoading" />
+      </div>
     </div>
    
   </div>
@@ -30,6 +35,7 @@
 <script>
 import Navbar from './components/layout/Navbar.vue';
 import Footer from './components/layout/Footer.vue';
+import JobDetail from './views/JobDetail.vue';
 import { useSettingsStore } from './store/settings';
 import { useBusinessHoursStore } from './store/business-hours';
 import { useBlogsStore } from './store/blogs';
@@ -39,11 +45,13 @@ import { useMembersStore } from './store/members';
 import { useQuoteStore } from './store/quote';
 import { useServiceStore } from './store/service';
 import { showToast } from './utils/toast';
+
 export default {
   name: 'App',
   components: {
     Navbar,
-    Footer
+    Footer,
+    JobDetail
   },
   data() {
     return {
@@ -58,18 +66,30 @@ export default {
       serviceStore: useServiceStore(),
     }
   },
-  async created() {
-    try {
-      await this.settingsStore.fetchSettings();
-      await this.businessHoursStore.fetchBusinessHours();
-      await this.blogsStore.fetchBlogs();
-      await this.galleryStore.fetchGallery();
-      await this.workResultStore.fetchWorkResult();
-      await this.membersStore.fetchMembers();
-      await this.serviceStore.fetchServices();
-    } catch (error) {
-      showToast(error.message, 'error');
-    } finally {
+  computed: {
+    isJobDetailRoute() {
+      return this.$route.name === 'JobDetail';
+    }
+  },
+  async mounted() {
+    if (this.$route.name !== 'JobDetail') {
+       this.isLoading = true;
+       try {
+        await this.serviceStore.fetchServices();
+        await this.settingsStore.fetchSettings();
+        await this.businessHoursStore.fetchBusinessHours();
+        await this.blogsStore.fetchBlogs();
+        await this.galleryStore.fetchGallery();
+        await this.workResultStore.fetchWorkResult();
+        await this.membersStore.fetchMembers();
+       
+        console.log(this.serviceStore.services);
+      } catch (error) {
+        showToast(error.message, 'error');
+      } finally {
+        this.isLoading = false;
+      }
+    } else {
       this.isLoading = false;
     }
   }
