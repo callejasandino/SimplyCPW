@@ -82,8 +82,6 @@ export default {
         await this.galleryStore.fetchGallery();
         await this.workResultStore.fetchWorkResult();
         await this.membersStore.fetchMembers();
-       
-        console.log(this.serviceStore.services);
       } catch (error) {
         showToast(error.message, 'error');
       } finally {

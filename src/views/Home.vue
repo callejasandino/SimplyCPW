@@ -158,10 +158,10 @@
 </template>
 
 <script>
-import ServiceCard from '../components/services/ServiceCard.vue';
-import BeforeAfterImage from '../components/gallery/BeforeAfterImage.vue';
-import { useWorkResultStore } from '../store/work-result';
-import { useServiceStore } from '../store/service';
+import ServiceCard from '@/components/services/ServiceCard.vue';
+import BeforeAfterImage from '@/components/gallery/BeforeAfterImage.vue';
+import { useWorkResultStore } from '@/store/work-result';
+import { useServiceStore } from '@/store/service';
 
 export default {
   name: 'Home',

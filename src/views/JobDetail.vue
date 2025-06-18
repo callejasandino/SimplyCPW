@@ -186,7 +186,7 @@
 </template>
 
 <script>
-import { useJobStore } from '../store/job'
+import { useJobStore } from '@/store/job'
 
 export default {
     data() {

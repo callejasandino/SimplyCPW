@@ -85,7 +85,7 @@
 </template>
 
 <script>
-import { useBlogsStore } from '../store/blogs';
+import { useBlogsStore } from '@/store/blogs';
 
 export default {
     name: 'BlogDetail',

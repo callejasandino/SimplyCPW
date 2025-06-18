@@ -1,14 +1,14 @@
 <template>
     <div>
-        <section class="relative py-52 bg-primary">
-            <div class="absolute inset-0 bg-primary opacity-90">
+        <section class="relative py-32 md:py-52 water-gradient">
+            <div class="absolute inset-0 bg-primary opacity-20">
                 <div class="absolute inset-0 bg-[url('https://images.pexels.com/photos/3651598/pexels-photo-3651598.jpeg?auto=compress&cs=tinysrgb&w=1920')] bg-cover bg-center mix-blend-overlay"></div>
             </div>
-            <div class="container mx-auto px-4 relative z-10">
-                <div class="text-center text-white">
-                    <h1 class="text-4xl md:text-5xl font-bold mb-4">Latest Articles</h1>
-                    <p class="text-xl max-w-3xl mx-auto">
-                        Discover insights, tips, and stories from our community
+            <div class="container mx-auto relative z-10">
+                <div class="text-center text-white slide-up">
+                    <h1 class="font-bold mb-6">Blog</h1>
+                    <p class="text-xl md:text-2xl max-w-4xl mx-auto opacity-90">
+                        Stay updated with our latest blog posts and articles
                     </p>
                 </div>
             </div>
@@ -131,7 +131,7 @@
 </template>
 
 <script>
-import { useBlogsStore } from '../store/blogs'
+import { useBlogsStore } from '@/store/blogs'
 
 export default {
     name: 'Blog',

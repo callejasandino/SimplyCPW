@@ -5,6 +5,7 @@ import axios from 'axios'
 export const useQuoteStore = defineStore('quotes', () => {
   const error = ref(null)
   const loading = ref(false)
+  
   async function addQuote(quote) {
     error.value = null
     loading.value = true

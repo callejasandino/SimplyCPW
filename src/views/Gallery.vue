@@ -1,18 +1,18 @@
 <template>
   <div class="gallery-page">
     <!-- Page Header -->
-    <section class="relative py-52 bg-primary">
-      <div class="absolute inset-0 bg-primary opacity-90">
-        <div class="absolute inset-0 bg-[url('https://images.pexels.com/photos/19931558/pexels-photo-19931558.jpeg?auto=compress&cs=tinysrgb&w=1920')] bg-cover bg-center mix-blend-overlay"></div>
-      </div>
-      <div class="container mx-auto px-4 relative z-10">
-        <div class="text-center text-white fade-in">
-          <h1 class="text-4xl md:text-5xl font-bold mb-4">Our Work Gallery</h1>
-          <p class="text-xl max-w-3xl mx-auto">
-            Discover our amazing pressure washing transformations
-          </p>
+    <section class="relative py-32 md:py-52 water-gradient">
+        <div class="absolute inset-0 bg-primary opacity-20">
+            <div class="absolute inset-0 bg-[url('https://images.pexels.com/photos/3651598/pexels-photo-3651598.jpeg?auto=compress&cs=tinysrgb&w=1920')] bg-cover bg-center mix-blend-overlay"></div>
         </div>
-      </div>
+        <div class="container mx-auto relative z-10">
+            <div class="text-center text-white slide-up">
+                <h1 class="font-bold mb-6">Gallery</h1>
+                <p class="text-xl md:text-2xl max-w-4xl mx-auto opacity-90">
+                    Discover our amazing pressure washing transformations
+                </p>
+            </div>
+        </div>
     </section>
 
     <!-- Gallery Filter -->
@@ -144,7 +144,7 @@
 </template>
 
 <script>
-import { useGalleryStore } from '../store/gallery';
+import { useGalleryStore } from '@/store/gallery';
 import VueEasyLightbox from 'vue-easy-lightbox';
 
 export default {

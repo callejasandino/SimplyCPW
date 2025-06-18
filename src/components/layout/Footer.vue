@@ -116,9 +116,9 @@
 </template>
 
 <script>
-import { useSettingsStore } from '../../store/settings'
-import { useServiceStore } from '../../store/service'
-import { convertNameToId } from '../../utils/id-converter'  
+import { useSettingsStore } from '@/store/settings'
+import { useServiceStore } from '@/store/service'
+import { convertNameToId } from '@/utils/id-converter'  
 export default {
   name: 'Footer',
   data() {

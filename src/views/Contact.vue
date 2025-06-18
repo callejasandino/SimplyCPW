@@ -1,18 +1,18 @@
 <template>
   <div class="contact-page">
     <!-- Page Header -->
-    <section class="relative py-52 bg-primary">
-      <div class="absolute inset-0 bg-primary opacity-90">
-        <div class="absolute inset-0 bg-[url('https://images.pexels.com/photos/3651598/pexels-photo-3651598.jpeg?auto=compress&cs=tinysrgb&w=1920')] bg-cover bg-center mix-blend-overlay"></div>
-      </div>
-      <div class="container mx-auto px-4 relative z-10">
-        <div class="text-center text-white">
-          <h1 class="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
-          <p class="text-xl max-w-3xl mx-auto">
-            Get in touch with our team for a free quote or to learn more about our services
-          </p>
+    <section class="relative py-32 md:py-52 water-gradient">
+        <div class="absolute inset-0 bg-primary opacity-20">
+            <div class="absolute inset-0 bg-[url('https://images.pexels.com/photos/3651598/pexels-photo-3651598.jpeg?auto=compress&cs=tinysrgb&w=1920')] bg-cover bg-center mix-blend-overlay"></div>
         </div>
-      </div>
+        <div class="container mx-auto relative z-10">
+            <div class="text-center text-white slide-up">
+                <h1 class="font-bold mb-6">Contact Us</h1>
+                <p class="text-xl md:text-2xl max-w-4xl mx-auto opacity-90">
+                    Get in touch with us for any questions or inquiries
+                </p>
+            </div>
+        </div>
     </section>
 
     <!-- Contact Information & Form -->
@@ -140,8 +140,6 @@
                   <span class="text-gray-600">Sunday:</span>
                   <span class="font-medium">{{ businessHours.sunday.isOpen ? formatTime(businessHours.sunday.openTime) + ' - ' + formatTime(businessHours.sunday.closeTime) : 'Closed' }}</span>
                 </li>
-                
-                
               </ul>
             </div>
           </div>
@@ -248,7 +246,24 @@
                   I agree to the <a href="#" class="text-primary hover:underline">terms and conditions</a> and <a href="#" class="text-primary hover:underline">privacy policy</a>.
                 </label>
               </div>
-              
+
+              <div class="flex items-start">
+                <input
+                  id="optIn"
+                  type="checkbox"
+                  v-model="form.optIn"
+                  class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded mt-1"
+                  required
+                />
+                <label for="optIn" class="ml-2 text-sm text-gray-700">
+                  I would like to receive updates and promotions from Simply CPW.
+                </label>
+              </div>
+
+              <!-- recaptcha -->
+              <div class="g-recaptcha" :data-sitekey="siteKey"></div>
+              <input type="hidden" name="gRecaptchaResponse" v-model="form.gRecaptchaResponse" required>
+
               <div>
                 <button 
                   type="submit"
@@ -345,11 +360,11 @@
 </template>
 
 <script>
-import { useServiceStore } from '../store/service'
-import { useSettingsStore } from '../store/settings'
-import { useBusinessHoursStore } from '../store/business-hours'
-import { useQuoteStore } from '../store/quote'
-import { formatPhoneNumber } from '../utils/phonenumber'
+import { useServiceStore } from '@/store/service'
+import { useSettingsStore } from '@/store/settings'
+import { useBusinessHoursStore } from '@/store/business-hours'
+import { useQuoteStore } from '@/store/quote'
+import { formatPhoneNumber } from '@/utils/phonenumber'
 export default {
   name: 'Contact',
   data() {
@@ -380,18 +395,30 @@ export default {
         address: '',
         servicesNeeded: [],
         additionalInfo: '',
-        agreedToTerms: false
+        agreedToTerms: false,
+        optIn: false,
+        gRecaptchaResponse: ''
       },
       services: [],
       error: null,
       submitted: false,
+      siteKey: import.meta.env.VITE_CAPTCHA_SITE_KEY
     }
   },
   methods: {
 
     async submitForm() {
+
+      const response = grecaptcha.getResponse()
+
+      if (!response) {
+        alert('Please complete the CAPTCHA')
+        return
+      }
+
       this.error = null
       this.submitting = true
+      this.form.gRecaptchaResponse = response
       await this.quotesStore.addQuote(this.form)
       if (this.quotesStore.error) {
         this.submitting = false
@@ -407,7 +434,9 @@ export default {
           address: '',
           servicesNeeded: [],
           additionalInfo: '',
-          agreedToTerms: false
+          agreedToTerms: false,
+          optIn: false,
+          gRecaptchaResponse: ''
         }
       }
 
@@ -535,6 +564,10 @@ export default {
     
     // Parse areas served or use empty array
     this.areasServed = settings.areasServed ? JSON.parse(settings.areasServed) : []
+
+    const script = document.createElement('script')
+    script.setAttribute('src', 'https://www.google.com/recaptcha/api.js')
+    document.head.appendChild(script)
   }
 
 }

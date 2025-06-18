@@ -1,18 +1,18 @@
 <template>
   <div class="services-page">
     <!-- Page Header -->
-    <section class="relative py-52 bg-primary">
-      <div class="absolute inset-0 bg-primary opacity-90">
-        <div class="absolute inset-0 bg-[url('https://images.pexels.com/photos/3833643/pexels-photo-3833643.jpeg?auto=compress&cs=tinysrgb&w=1920')] bg-cover bg-center mix-blend-overlay"></div>
-      </div>
-      <div class="container mx-auto px-4 relative z-10">
-        <div class="text-center text-white">
-          <h1 class="text-4xl md:text-5xl font-bold mb-4">Our Services</h1>
-          <p class="text-xl max-w-3xl mx-auto">
-            Professional pressure washing solutions for residential and commercial properties
-          </p>
+     <section class="relative py-32 md:py-52 water-gradient">
+        <div class="absolute inset-0 bg-primary opacity-20">
+            <div class="absolute inset-0 bg-[url('https://images.pexels.com/photos/3651598/pexels-photo-3651598.jpeg?auto=compress&cs=tinysrgb&w=1920')] bg-cover bg-center mix-blend-overlay"></div>
         </div>
-      </div>
+        <div class="container mx-auto relative z-10">
+            <div class="text-center text-white slide-up">
+                <h1 class="font-bold mb-6">Gallery</h1>
+                <p class="text-xl md:text-2xl max-w-4xl mx-auto opacity-90">
+                    Discover our amazing pressure washing transformations
+                </p>
+            </div>
+        </div>
     </section>
 
     <!-- Service Navigation -->
@@ -102,10 +102,10 @@
 </template>
 
 <script>
-import ServiceDetail from '../components/services/ServiceDetail.vue';
-import { useServiceStore } from '../store/service';
-import { useSettingsStore } from '../store/settings';
-import { convertNameToId } from '../utils/id-converter';
+import ServiceDetail from '@/components/services/ServiceDetail.vue';
+import { useServiceStore } from '@/store/service';
+import { useSettingsStore } from '@/store/settings';
+import { convertNameToId } from '@/utils/id-converter';
 export default {
   name: 'Services',
   components: {

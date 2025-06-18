@@ -54,7 +54,7 @@
 
 <script>
 import NavLink from './NavLink.vue';
-import { useSettingsStore } from '../../store/settings';
+import { useSettingsStore } from '@/store/settings';
 export default {
   name: 'Navbar',
   components: {
@@ -71,7 +71,8 @@ export default {
         { to: '/gallery', label: 'Gallery' },
         { to: '/about', label: 'About' },
         { to: '/contact', label: 'Contact' },
-        { to: '/blog', label: 'Blog' }
+        { to: '/blog', label: 'Blog' },
+        { to: '/business-events', label: 'Business Events' }
       ],
       settingsStore: useSettingsStore(),
     }

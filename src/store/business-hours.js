@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
-import { showToast } from '../utils/toast.js'
+import { showToast } from '@/utils/toast.js'
 
 export const useBusinessHoursStore = defineStore('business-hours', () => {
   const businessHours = ref([])

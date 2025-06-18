@@ -1,17 +1,17 @@
 <template>
   <div class="about-page">
     <!-- Page Header -->
-    <section class="relative py-52 bg-primary">
-      <div class="absolute inset-0 bg-primary opacity-90">
-        <div class="absolute inset-0 bg-[url('https://images.pexels.com/photos/6044972/pexels-photo-6044972.jpeg?auto=compress&cs=tinysrgb&w=1920')] bg-cover bg-center mix-blend-overlay"></div>
+    <section class="relative py-32 md:py-52 water-gradient">
+      <div class="absolute inset-0 bg-primary opacity-20">
+          <div class="absolute inset-0 bg-[url('https://images.pexels.com/photos/3651598/pexels-photo-3651598.jpeg?auto=compress&cs=tinysrgb&w=1920')] bg-cover bg-center mix-blend-overlay"></div>
       </div>
-      <div class="container mx-auto px-4 relative z-10">
-        <div class="text-center text-white">
-          <h1 class="text-4xl md:text-5xl font-bold mb-4">About Us</h1>
-          <p class="text-xl max-w-3xl mx-auto">
-            Learn about our company and dedication to excellence in pressure washing
-          </p>
-        </div>
+      <div class="container mx-auto relative z-10">
+          <div class="text-center text-white slide-up">
+              <h1 class="font-bold mb-6">About Us</h1>
+              <p class="text-xl md:text-2xl max-w-4xl mx-auto opacity-90">
+                  Learn more about our company and the services we offer
+              </p>
+          </div>
       </div>
     </section>
 
@@ -275,8 +275,8 @@
 </template>
 
 <script>
-import { useSettingsStore } from '../store/settings'
-import { useMembersStore } from '../store/members'
+import { useSettingsStore } from '@/store/settings'
+import { useMembersStore } from '@/store/members'
 
 export default {
   name: 'About',
