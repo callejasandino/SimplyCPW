@@ -40,7 +40,7 @@
                         <img 
                             :src="businessEvent.image" 
                             :alt="businessEvent.title"
-                            class="w-full h-64 md:h-96 object-cover"
+                            class="w-full h-full md:h-3/4 object-cover"
                         >
                     </div>
                 </div>
@@ -84,17 +84,43 @@
                     </div>
                 </div>
 
+
+                <div class="mb-8" v-if="businessEvent.event_type === 'promotional' && businessEvent.discounted_services.length > 0">
+                    <p class="text-xl text-neutral-700 leading-relaxed text-justify font-bold mb-4">
+                        Discounted Services
+                    </p>
+                
+                    <div v-for="discountedService in businessEvent.discounted_services" :key="discountedService.service_id">
+                        
+                        <div class="card mb-4">
+                            <div class="flex justify-between items-center">
+                                <h3 class="card-title">{{ discountedService.service }}</h3>
+                                <h3 class="card-text text-primary font-bold">{{ discountedService.discount }}%</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
                 <!-- Back to Events -->
-                <div class="mt-12 text-center slide-up">
-                    <router-link 
-                        to="/business-events" 
-                        class="btn btn-outline inline-flex items-center gap-2"
-                    >
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
-                        </svg>
-                        Back to All Events
-                    </router-link>
+
+                <div :class="businessEvent.event_type === 'promotional' ? 'flex justify-between' : 'flex justify-center'">
+                    <div class="mt-12 text-center slide-up">
+                        <router-link 
+                            to="/business-events" 
+                            class="btn btn-outline items-center gap-2"
+                        >
+                            Back to All Events
+                        </router-link>
+                    </div>
+                    <div class="mt-12 text-center slide-up" v-if="businessEvent.event_type === 'promotional'">
+                        <router-link 
+                            :to="`/avail-services/${businessEvent.slug}`" 
+                            class="btn btn-outline items-center gap-2"
+                        >
+                            Avail Services
+                        </router-link>
+                    </div>
                 </div>
             </div>
         </article>
@@ -126,7 +152,6 @@ export default {
     async mounted() { 
         await this.businessEventsStore.fetchBusinessEvent(this.$route.params.slug)
         this.businessEvent = this.businessEventsStore.businessEvent
-        console.log(this.businessEvent)
     },
     methods: {
         formatDate(dateString) {

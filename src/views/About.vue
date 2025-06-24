@@ -297,7 +297,6 @@ export default {
     this.companyMission = this.settingsStore.companyMission
     this.companyVision = this.settingsStore.companyVision
     this.companyPhone = this.settingsStore.companyPhone
-    console.log(this.members)
   }
 
 }

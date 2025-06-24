@@ -52,6 +52,11 @@ const routes = [
       component: async () => await import('@/views/BusinessEventDetail.vue')
     },
     {
+      path: '/avail-services/:slug',
+      name: 'AvailServices',
+      component: async () => await import('@/views/AvailServices.vue')
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
       component: async () => await import('@/views/NotFound.vue'),

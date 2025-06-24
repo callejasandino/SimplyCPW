@@ -58,7 +58,7 @@
                 </div>
                 
                 <!-- CTA Button -->
-                <div class="pt-4">
+                <div class="pt-4 flex justify-end">
                     <button 
                         @click="openCtaLink"
                         class="btn btn-primary inline-flex items-center gap-2"

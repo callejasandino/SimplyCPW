@@ -13,7 +13,7 @@ export const showToast = (message, type = 'success') => {
       toast.success(message, 
         {
           position: 'top-right',
-          duration: 3000,
+          duration: 5000,
           theme: 'bootstrap',
           type: 'success'
         }
@@ -23,7 +23,7 @@ export const showToast = (message, type = 'success') => {
       toast.error(message, 
         {
           position: 'top-right',
-          duration: 3000,
+          duration: 5000,
           theme: 'bootstrap',
           type: 'error'
         } 
@@ -33,7 +33,7 @@ export const showToast = (message, type = 'success') => {
       toast.warning(message, 
         {
           position: 'top-right',
-          duration: 3000,
+          duration: 5000,
           theme: 'bootstrap',
           type: 'warning'
         }
@@ -43,7 +43,7 @@ export const showToast = (message, type = 'success') => {
       toast.info(message, 
         {
           position: 'top-right',
-          duration: 3000,
+          duration: 5000,
           theme: 'bootstrap',
           type: 'info'
         }
@@ -53,7 +53,7 @@ export const showToast = (message, type = 'success') => {
       toast.default(message, 
         {
           position: 'top-right',
-          duration: 3000,
+          duration: 5000,
           theme: 'bootstrap',
           type: 'default'
         }

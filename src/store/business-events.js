@@ -7,6 +7,8 @@ export const useBusinessEventsStore = defineStore('business-events', () => {
   const businessEvent = ref(null)
   const error = ref(null)
   const pagination = ref(null)
+  const discountedServices = ref([])
+  const clientJob = ref(null)
 
   async function fetchBusinessEvents(page = 1) {
     error.value = null
@@ -39,15 +41,41 @@ export const useBusinessEventsStore = defineStore('business-events', () => {
       error.value = err.message
     }
   }
+
+  async function fetchDiscountedServices(slug) {
+    error.value = null
+
+    try {
+      const response = await axios.get(`client/business-events/${slug}/discounted-services`)
+      discountedServices.value = response.data.discounted_services
+    } catch (err) {
+      error.value = err.message
+    }
+  }
+
+  async function processClientBooking(data) {
+    error.value = null
+    try {
+      const response = await axios.post('client/business-events/process-booking', data)
+      clientJob.value = response.data
+    } catch (err) {
+      error.value = err.message
+    }
+  }
+
   return {
     // State
     businessEvents,
     businessEvent,
     error,
     pagination,
+    discountedServices,
+    clientJob,
 
     // Actions
     fetchBusinessEvents,
-    fetchBusinessEvent
+    fetchBusinessEvent,
+    fetchDiscountedServices,
+    processClientBooking
   }
 })

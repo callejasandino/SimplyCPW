@@ -20,7 +20,7 @@
             :to="link.to" 
             :label="link.label" 
             :scrolled="scrolled" />
-          <a href="/contact" class="btn btn-accent">Book Now</a>
+          <router-link to="/contact" class="btn btn-accent">Book Now</router-link>
         </div>
 
         <!-- Mobile Menu Button -->

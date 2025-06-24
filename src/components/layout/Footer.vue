@@ -60,11 +60,15 @@
         <div class="md:col-span-1">
           <h3 class="text-xl font-semibold mb-4">Quick Links</h3>
           <ul class="space-y-2">
-            <li><router-link to="/" class="text-gray-300 hover:text-secondary">Home</router-link></li>
-            <li><router-link to="/services" class="text-gray-300 hover:text-secondary">Services</router-link></li>
-            <li><router-link to="/gallery" class="text-gray-300 hover:text-secondary">Gallery</router-link></li>
-            <li><router-link to="/about" class="text-gray-300 hover:text-secondary">About Us</router-link></li>
-            <li><router-link to="/contact" class="text-gray-300 hover:text-secondary">Contact</router-link></li>
+            <li><router-link @click.prevent="scrollToTop" to="/" class="text-gray-300 hover:text-secondary">Home</router-link></li>
+            <li><router-link @click.prevent="scrollToTop" to="/services" class="text-gray-300 hover:text-secondary">Services</router-link></li>
+            <li><router-link @click.prevent="scrollToTop" to="/gallery" class="text-gray-300 hover:text-secondary">Gallery</router-link></li>
+            <li><router-link @click.prevent="scrollToTop" to="/about" class="text-gray-300 hover:text-secondary">About Us</router-link></li>
+            <li><router-link @click.prevent="scrollToTop" to="/contact" class="text-gray-300 hover:text-secondary">Contact</router-link></li>
+            <li><router-link @click.prevent="scrollToTop" to="/blog" class="text-gray-300 hover:text-secondary">Blog</router-link></li>
+            <li><router-link @click.prevent="scrollToTop" to="/business-events" class="text-gray-300 hover:text-secondary">Business Events</router-link></li>
+            <li><button class="text-gray-300 hover:text-secondary" @click="isSubscribeModalOpen = true, scrollToTop()">Subscribe</button></li>
+            <li><button class="text-gray-300 hover:text-secondary" @click="isUnsubscribeModalOpen = true, scrollToTop()">Unsubscribe</button></li>
           </ul>
         </div>
 
@@ -113,14 +117,22 @@
       </div>
     </div>
   </footer>
+  <Subscribe :show="isSubscribeModalOpen" @close="isSubscribeModalOpen = false" />
+  <Unsubscribe :show="isUnsubscribeModalOpen" @close="isUnsubscribeModalOpen = false" />
 </template>
 
 <script>
 import { useSettingsStore } from '@/store/settings'
 import { useServiceStore } from '@/store/service'
 import { convertNameToId } from '@/utils/id-converter'  
+import Subscribe from '../modals/Subscribe.vue'
+import Unsubscribe from '../modals/Unsubscribe.vue'
 export default {
   name: 'Footer',
+  components: {
+    Subscribe,
+    Unsubscribe
+  },
   data() {
     return {
       settingsStore: useSettingsStore(),
@@ -139,6 +151,8 @@ export default {
       companyYoutube: null,
       companyTiktok: null,
       companyPinterest: null,
+      isSubscribeModalOpen: false,
+      isUnsubscribeModalOpen: false,
     }
   },
   computed: {
@@ -149,6 +163,12 @@ export default {
   methods: {
     convertNameToId(serviceName) {
       return convertNameToId(serviceName);
+    },
+    scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     }
   },
   async mounted() {

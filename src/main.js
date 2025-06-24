@@ -4,6 +4,8 @@ import './style.css'
 import App from './App.vue'
 import router from './router'
 import axios from 'axios'
+import ToastPlugin from 'vue-toast-notification'
+import 'vue-toast-notification/dist/theme-bootstrap.css'
 
 const pinia = createPinia()
 
@@ -25,4 +27,5 @@ axios.interceptors.request.use(
 createApp(App)
   .use(pinia)
   .use(router)
+  .use(ToastPlugin)
   .mount('#app')

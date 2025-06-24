@@ -28,7 +28,7 @@
         <Footer v-if="!isLoading" />
       </div>
     </div>
-   
+    <Subscribe :show="isSubscribeModalOpen" @close="isSubscribeModalOpen = false" />
   </div>
 </template>
 
@@ -45,13 +45,15 @@ import { useMembersStore } from './store/members';
 import { useQuoteStore } from './store/quote';
 import { useServiceStore } from './store/service';
 import { showToast } from './utils/toast';
-
+import { useBusinessEventsStore } from '@/store/business-events'
+import Subscribe from './components/modals/Subscribe.vue'
 export default {
   name: 'App',
   components: {
     Navbar,
     Footer,
-    JobDetail
+    JobDetail,
+    Subscribe
   },
   data() {
     return {
@@ -64,6 +66,8 @@ export default {
       membersStore: useMembersStore(),
       quoteStore: useQuoteStore(),
       serviceStore: useServiceStore(),
+      businessEventsStore: useBusinessEventsStore(),
+      isSubscribeModalOpen: false
     }
   },
   computed: {
@@ -82,6 +86,7 @@ export default {
         await this.galleryStore.fetchGallery();
         await this.workResultStore.fetchWorkResult();
         await this.membersStore.fetchMembers();
+        await this.businessEventsStore.fetchBusinessEvents();
       } catch (error) {
         showToast(error.message, 'error');
       } finally {
@@ -90,6 +95,10 @@ export default {
     } else {
       this.isLoading = false;
     }
+
+    setTimeout(() => {
+      this.isSubscribeModalOpen = true
+    }, 3000)
   }
 }
 </script>

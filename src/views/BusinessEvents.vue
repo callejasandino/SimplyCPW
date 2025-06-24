@@ -82,15 +82,7 @@ export default {
     },
     methods: {
         async fetchEvents() {
-            this.loading = true
-            try {
-                await this.businessEventsStore.fetchBusinessEvents()
-                this.businessEvents = this.businessEventsStore.businessEvents
-            } catch (error) {
-                console.error('Error fetching business events:', error)
-            } finally {
-                this.loading = false
-            }
+            this.businessEvents = this.businessEventsStore.businessEvents
         }
     }
 }

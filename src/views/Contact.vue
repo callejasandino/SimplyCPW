@@ -243,7 +243,7 @@
                   required
                 />
                 <label for="terms" class="ml-2 text-sm text-gray-700">
-                  I agree to the <a href="#" class="text-primary hover:underline">terms and conditions</a> and <a href="#" class="text-primary hover:underline">privacy policy</a>.
+                  I agree to the <button class="text-primary hover:underline" @click.prevent="showTermsAndCondition = true">Terms and Conditions</button> and <button class="text-primary hover:underline" @click.prevent="showPrivacyPolicy = true">Privacy Policy</button>.
                 </label>
               </div>
 
@@ -253,7 +253,6 @@
                   type="checkbox"
                   v-model="form.optIn"
                   class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded mt-1"
-                  required
                 />
                 <label for="optIn" class="ml-2 text-sm text-gray-700">
                   I would like to receive updates and promotions from Simply CPW.
@@ -283,15 +282,6 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M12 3v1m0 16H9m3 0h3m-3-13h.01M12 18h.01M12 12h.01M3 12h.01M12 3a9 9 0 110 18 9 9 0 010-18z"></path>
                 </svg>
                 <p>{{ error }}</p>
-              </div>
-            </div>
-
-             <div v-if="submitted" class="mt-6 p-4 bg-green-100 text-green-700 rounded-md">
-              <div class="flex">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <p>Thank you for your inquiry! We'll get back to you within 24 hours.</p>
               </div>
             </div>
           </div>
@@ -356,6 +346,9 @@
         </div>
       </div>
     </section>
+
+    <PrivacyPolicy :show="showPrivacyPolicy" @close="showPrivacyPolicy = false" />
+    <TermsAndCondition :show="showTermsAndCondition" @close="showTermsAndCondition = false" />
   </div>
 </template>
 
@@ -365,8 +358,14 @@ import { useSettingsStore } from '@/store/settings'
 import { useBusinessHoursStore } from '@/store/business-hours'
 import { useQuoteStore } from '@/store/quote'
 import { formatPhoneNumber } from '@/utils/phonenumber'
+import PrivacyPolicy from '../components/modals/PrivacyPolicy.vue'
+import TermsAndCondition from '../components/modals/TermsAndCondition.vue'
 export default {
   name: 'Contact',
+  components: {
+    PrivacyPolicy,
+    TermsAndCondition
+  },
   data() {
     return {
       servicesStore: useServiceStore(),
@@ -402,7 +401,9 @@ export default {
       services: [],
       error: null,
       submitted: false,
-      siteKey: import.meta.env.VITE_CAPTCHA_SITE_KEY
+      siteKey: import.meta.env.VITE_CAPTCHA_SITE_KEY,
+      showPrivacyPolicy: false,
+      showTermsAndCondition: false
     }
   },
   methods: {
@@ -412,7 +413,7 @@ export default {
       const response = grecaptcha.getResponse()
 
       if (!response) {
-        alert('Please complete the CAPTCHA')
+        showToast('Please complete the CAPTCHA', 'error')
         return
       }
 

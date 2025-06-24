@@ -4,7 +4,7 @@
             <!-- Receipt Header -->
             <div class="card mb-6">
                 <div class="gradient-bg text-white text-center py-8 px-6">
-                    <img :src="settings.company_logo" alt="Company Logo" class="w-20 h-20 mx-auto mb-4">
+                    <img :src="settings.company_logo" alt="Company Logo" class="w-[500px] h-[350px] mx-auto">
                     <h1 class="text-3xl font-bold mb-2">{{ settings.company_name }}</h1>
                     <p class="text-lg opacity-90">Service Receipt</p>
                 </div>
