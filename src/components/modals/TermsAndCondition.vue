@@ -25,7 +25,6 @@
           <li>Service scheduling</li>
           <li>Viewing of FAQs, gallery, and blog</li>
           <li>Access to promotional events and business updates</li>
-          <li>Real-time chat with our representatives</li>
         </ul>
 
         <h3 class="text-lg font-semibold text-neutral-dark mt-6 mb-3">2. Use of Website</h3>

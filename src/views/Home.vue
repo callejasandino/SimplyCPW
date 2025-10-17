@@ -4,32 +4,20 @@
     <section class="relative h-screen flex items-center justify-center overflow-hidden">
       <!-- Background Image with Overlay -->
       <div class="absolute inset-0 z-0">
-        <img 
-          src="https://images.pexels.com/photos/3750893/pexels-photo-3750893.jpeg?auto=compress&cs=tinysrgb&w=1920"
-          alt="Pressure Washing" 
-          class="object-cover w-full h-full"
-        />
+        <img src="https://images.pexels.com/photos/3750893/pexels-photo-3750893.jpeg?auto=compress&cs=tinysrgb&w=1920" alt="Pressure Washing" class="object-cover w-full h-full" />
         <div class="absolute inset-0 bg-primary bg-opacity-60"></div>
       </div>
-      
+
       <!-- Hero Content -->
       <div class="container mx-auto px-4 z-10 text-white text-center">
-        <h1 class="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
-          Professional Pressure Washing Services
-        </h1>
-        <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto animate-slide-up">
-          Transform your property with our high-quality, affordable pressure washing solutions
-        </p>
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">Professional Pressure Washing Services</h1>
+        <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto animate-slide-up">Transform your property with our high-quality, affordable pressure washing solutions</p>
         <div class="flex flex-col sm:flex-row justify-center gap-4 animate-slide-up">
-          <router-link to="/contact" class="btn btn-accent text-center">
-            Get a Free Quote
-          </router-link>
-          <router-link to="/services" class="btn btn-outline border-white text-white hover:bg-white hover:text-primary">
-            Our Services
-          </router-link>
+          <router-link to="/contact" class="btn btn-accent text-center"> Get a Free Quote </router-link>
+          <router-link to="/services" class="btn btn-outline border-white text-white hover:bg-white hover:text-primary"> Our Services </router-link>
         </div>
       </div>
-      
+
       <!-- Scroll Down Indicator -->
       <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,7 +30,7 @@
     <section class="py-16 bg-neutral-white">
       <div class="container mx-auto px-4">
         <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Why Choose Simply Clean Power Washing?</h2>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="feature-card p-6 bg-white rounded-lg shadow-md text-center transform transition duration-300 hover:scale-105">
             <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
@@ -53,7 +41,7 @@
             <h3 class="text-xl font-bold mb-3 text-primary">Experienced Professionals</h3>
             <p class="text-gray-600">Our team brings years of expertise in pressure washing for both residential and commercial properties.</p>
           </div>
-          
+
           <div class="feature-card p-6 bg-white rounded-lg shadow-md text-center transform transition duration-300 hover:scale-105">
             <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
               <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,7 +51,7 @@
             <h3 class="text-xl font-bold mb-3 text-primary">Prompt & Reliable</h3>
             <p class="text-gray-600">We arrive on time and complete projects efficiently without compromising on quality.</p>
           </div>
-          
+
           <div class="feature-card p-6 bg-white rounded-lg shadow-md text-center transform transition duration-300 hover:scale-105">
             <div class="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
               <svg class="w-8 h-8 text-neutral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,51 +69,16 @@
     <section class="py-16 bg-gray-100">
       <div class="container mx-auto px-4">
         <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Our Services</h2>
-        <p class="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
-          We offer comprehensive pressure washing solutions for all your needs
-        </p>
-        
+        <p class="text-center text-gray-600 mb-12 max-w-3xl mx-auto">We offer comprehensive pressure washing solutions for all your needs</p>
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div v-for="service in services" :key="service.id">
-            <ServiceCard 
-              :title="service.name" 
-              :description="service.description"
-              :image="service.image"
-              :link="`/services/#${convertNameToId(service.name)}`"
-            />
+            <ServiceCard :title="service.name" :description="service.description" :image="service.path" :link="`/services/#${convertNameToId(service.name)}`" />
           </div>
         </div>
-        
-        <div class="text-center mt-12">
-          <router-link to="/services" class="btn btn-primary">
-            View All Services
-          </router-link>
-        </div>
-      </div>
-    </section>
 
-    <!-- Before & After Preview -->
-    <section class="py-16 bg-white">
-      <div class="container mx-auto px-4">
-        <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Before & After</h2>
-        <p class="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
-          See the dramatic difference our pressure washing services can make
-        </p>
-        
-        <div class="grid grid-cols-1 md:grid-cols-1 gap-8">
-          <BeforeAfterImage 
-            v-for="workResult in workResults" 
-            :key="workResult.id"
-            :before="workResult.before_image"
-            :after="workResult.after_image"
-            :title="workResult.title"
-          />
-        </div>
-        
-        <div class="text-center mt-10">
-          <router-link to="/gallery" class="btn btn-outline">
-            View Gallery
-          </router-link>
+        <div class="text-center mt-12">
+          <router-link :to="{ name: 'Services', params: { shop_uuid: shopUuid } }" class="btn btn-primary"> View All Services </router-link>
         </div>
       </div>
     </section>
@@ -146,49 +99,34 @@
     <section class="py-20 bg-primary water-gradient text-white">
       <div class="container mx-auto px-4 text-center">
         <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Transform Your Property?</h2>
-        <p class="text-xl mb-8 max-w-3xl mx-auto">
-          Contact us today for a free, no-obligation quote and see the Simply Clean Power Washing difference!
-        </p>
-        <router-link to="/contact" class="btn btn-accent text-lg px-8 py-4">
-          Get a Free Quote
-        </router-link>
+        <p class="text-xl mb-8 max-w-3xl mx-auto">Contact us today for a free, no-obligation quote and see the Simply Clean Power Washing difference!</p>
+        <router-link to="/contact" class="btn btn-accent text-lg px-8 py-4"> Get a Free Quote </router-link>
       </div>
     </section>
   </div>
 </template>
 
-<script>
-import ServiceCard from '@/components/services/ServiceCard.vue';
-import BeforeAfterImage from '@/components/gallery/BeforeAfterImage.vue';
-import { useWorkResultStore } from '@/store/work-result';
-import { useServiceStore } from '@/store/service';
-
-export default {
-  name: 'Home',
-  components: {
-    ServiceCard,
-    BeforeAfterImage,
-    // TestimonialSlider
-  },
-  data() {
-    return {
-      workResultStore: useWorkResultStore(),
-      serviceStore: useServiceStore(),
-    }
-  },
-  methods: {
-    convertNameToId(name) {
-      return name.toLowerCase().replace(/ /g, '-');
-    }
-  },
-  computed: {
-    workResults() {
-      return this.workResultStore.workResult || [];
-    },
-    services() {
-      return this.serviceStore.services || [];
-    }
-  },
-  
+<script setup>
+import { computed, onMounted } from 'vue'
+import ServiceCard from '@/components/services/ServiceCard.vue'
+import { useServiceStore } from '@/store/service'
+// import { useWorkResultStore } from '@/store/work-result' // Added missing import
+import { useShop } from '@/composables/useShop'
+const { shopUuid } = useShop()
+// Store instances
+// const workResultStore = useWorkResultStore()
+const serviceStore = useServiceStore()
+const services = computed(() => serviceStore.services)
+// Methods
+const convertNameToId = (name) => {
+  return name.toLowerCase().replace(/ /g, '-')
 }
+
+const goToServices = () => {
+  return
+}
+
+onMounted(async () => {
+  await serviceStore.fetchServices(shopUuid.value)
+})
 </script>

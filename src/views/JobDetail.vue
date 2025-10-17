@@ -72,17 +72,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Equipment Used -->
-                    <div v-if="job.equipment && job.equipment.length > 0">
-                        <p class="text-sm text-gray-600 uppercase tracking-wide mb-3">Equipment Used</p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <div v-for="equipment in job.equipment" :key="equipment" 
-                                 class="flex items-center p-2 bg-gray-50 rounded">
-                                <span class="text-sm text-gray-700">{{ equipment }}</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -197,7 +186,6 @@ export default {
                 client: {},
                 team: [],
                 services: [],
-                equipment: []
             }
         }
     },

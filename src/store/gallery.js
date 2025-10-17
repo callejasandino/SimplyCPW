@@ -3,70 +3,84 @@ import { ref } from 'vue'
 import axios from 'axios'
 
 export const useGalleryStore = defineStore('gallery', () => {
+  // State
   const gallery = ref([])
-  const galleryResponse = ref(null)
   const error = ref(null)
   const loading = ref(false)
 
-  async function fetchGallery(page = 1, append = false) {
+  // Pagination state
+  const currentPage = ref(1)
+  const lastPage = ref(1)
+  const total = ref(0)
+  const hasMorePages = ref(false)
+
+  // Helper function to update pagination state
+  const setPagination = (paginationData) => {
+    currentPage.value = paginationData.current_page || 1
+    lastPage.value = paginationData.last_page || 1
+    total.value = paginationData.total || 0
+    hasMorePages.value = currentPage.value < lastPage.value
+  }
+
+  // Fetch gallery data with pagination support
+  async function fetchGallery(shopUuid, page = 1, append = false) {
     error.value = null
     loading.value = true
-    
+
     try {
-      const response = await axios.get(`client/gallery?page=${page}`)
-      galleryResponse.value = response.data
-      
-      if (append && response.data.data) {
-        // Append new items to existing gallery for load more functionality
-        gallery.value = [...gallery.value, ...response.data.data]
+      const response = await axios.get(`client/gallery/${shopUuid}`, {
+        params: { page },
+      })
+
+      const galleriesData = response.data.data.galleries
+
+      if (append) {
+        gallery.value.push(...galleriesData.data)
       } else {
-        // Replace gallery data for initial load or refresh
-        gallery.value = response.data.data || response.data.gallery || []
+        gallery.value = galleriesData.data
       }
+
+      setPagination(galleriesData)
     } catch (err) {
-      error.value = err.message
-      console.error('Error fetching gallery:', err)
+      error.value = err?.response?.data?.message || err.message
     } finally {
       loading.value = false
     }
   }
 
-  async function loadMoreGallery() {
-    if (!galleryResponse.value || !galleryResponse.value.next_page_url) {
-      return false // No more pages available
-    }
-    
-    const nextPage = galleryResponse.value.current_page + 1
-    await fetchGallery(nextPage, true)
-    return true
+  // Load next page and append to existing gallery
+  async function loadMoreGallery(shopUuid) {
+    if (!hasMorePages.value || loading.value) return
+
+    const nextPage = currentPage.value + 1
+    await fetchGallery(shopUuid, nextPage, true)
   }
 
-  function getGalleryItem(id) {
-    return gallery.value.find(item => item.id === id || item.id === parseInt(id))
-  }
-
-  function hasMorePages() {
-    return galleryResponse.value && 
-           galleryResponse.value.current_page < galleryResponse.value.last_page
-  }
-
+  // Reset gallery state
   function resetGallery() {
     gallery.value = []
-    galleryResponse.value = null
+    currentPage.value = 1
+    lastPage.value = 1
+    total.value = 0
+    hasMorePages.value = false
     error.value = null
   }
 
   return {
     // State
     gallery,
-    galleryResponse,
     error,
     loading,
+
+    // Pagination
+    currentPage,
+    lastPage,
+    total,
+    hasMorePages,
+
     // Actions
     fetchGallery,
     loadMoreGallery,
-    getGalleryItem,
-    hasMorePages,
     resetGallery,
   }
 })

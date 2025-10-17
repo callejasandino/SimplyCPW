@@ -6,14 +6,14 @@ export const useServiceStore = defineStore('services', () => {
   const services = ref([])
   const error = ref(null)
 
-  async function fetchServices() {
+  async function fetchServices(shopUuid) {
     error.value = null
-    
+
     try {
-        const response = await axios.get('client/services')
-        services.value = response.data.services
+      const response = await axios.get(`client/services/${shopUuid}`)
+      services.value = response.data.data.services
     } catch (err) {
-        error.value = err.message
+      error.value = err.message
     }
   }
 
@@ -21,7 +21,7 @@ export const useServiceStore = defineStore('services', () => {
     // State
     services,
     error,
-    
+
     // Actions
     fetchServices,
   }
